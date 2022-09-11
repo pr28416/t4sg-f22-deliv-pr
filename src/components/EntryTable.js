@@ -7,11 +7,14 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import EntryModal from './EntryModal';
+import { Chip } from '@mui/material';
 import { getCategory } from '../utils/categories';
+import * as React from 'react';
 
 // Table component that displays entries on home screen
 
-export default function EntryTable({ entries }) {
+export default function EntryTable({ entries, snackbarCallback }) {
+
    return (
       <TableContainer component={Paper}>
          <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -35,9 +38,11 @@ export default function EntryTable({ entries }) {
                      </TableCell>
                      <TableCell align="right"><Link href={entry.link}>{entry.link}</Link></TableCell>
                      <TableCell align="right">{entry.user}</TableCell>
-                     <TableCell align="right">{getCategory(entry.category).name}</TableCell>
+                     <TableCell align="right">
+                        <Chip label={getCategory(entry.category).name} variant="outlined" color={getCategory(entry.category).chipColorScheme} />
+                     </TableCell>
                      <TableCell sx={{ "padding-top": 0, "padding-bottom": 0 }} align="right">
-                        <EntryModal entry={entry} type="edit" />
+                        <EntryModal entry={entry} type="edit" snackbarCallback={snackbarCallback} />
                      </TableCell>
                   </TableRow>
                ))}

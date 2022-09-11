@@ -1,4 +1,6 @@
+import { useTheme } from '@emotion/react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { StepIcon } from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -10,10 +12,11 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
+import { Snackbar, Alert } from '@mui/material';
 import * as React from 'react';
 import { useState } from 'react';
 import { categories } from '../utils/categories';
-import { addEntry } from '../utils/mutations';
+import { addEntry, deleteEntry, updateEntry } from '../utils/mutations';
 
 // Modal component for individual entries.
 
@@ -24,7 +27,7 @@ type: Type of entry modal being opened.
    "edit" (for opening or editing an existing entry from table).
 user: User making query (The current logged in user). */
 
-export default function EntryModal({ entry, type, user }) {
+export default function EntryModal({ entry, type, user, snackbarCallback }) {
 
    // State variables for modal status
 
@@ -52,6 +55,12 @@ export default function EntryModal({ entry, type, user }) {
 
    // Mutation handlers
 
+   // const [snackbar, toggleSnackbar] = useState({isOpen: false, message: "No message.", severity: "info"});
+
+   // const closeSnackbar = () => {
+   //    toggleSnackbar({isOpen: false, message: snackbar.message, severity: snackbar.severity});
+   // }
+
    const handleAdd = () => {
       const newEntry = {
          name: name,
@@ -62,13 +71,43 @@ export default function EntryModal({ entry, type, user }) {
          userid: user?.uid,
       };
 
-      addEntry(newEntry).catch(console.error);
+      addEntry(newEntry)
+         .then(
+            () => snackbarCallback(`Successfully added ${name}.`, "info"),
+            (err) => snackbarCallback(`Could not add ${name}: ${err.message}.`, "error")
+         );
       handleClose();
    };
 
    // TODO: Add Edit Mutation Handler
+   const handleEdit = () => {
+      const updatedEntry = {
+         name: name || entry.name,
+         link: link || entry.link,
+         description: description || entry.description,
+         user: user?.displayName || entry.user,
+         category: category,
+         userid: user?.uid || entry.userid,
+         id: entry.id
+      }
+      updateEntry(updatedEntry)
+         .then(
+            () => snackbarCallback(`Successfully updated ${updatedEntry.name}.`, "success"),
+            err => snackbarCallback(`Could not update ${updatedEntry.name}: ${err.message}.`, "error")
+         );
+      handleClose();
+   }
 
    // TODO: Add Delete Mutation Handler
+   const handleDelete = () => {
+      const name = entry.name;
+      deleteEntry(entry)
+         .then(
+            () => snackbarCallback(`Successfully deleted ${name}.`, "secondary"),
+            err => snackbarCallback(`Could not delete ${name}: ${err.message}.`, "error")
+         );
+      handleClose();
+   }
 
    // Button handlers for modal opening and inside-modal actions.
    // These buttons are displayed conditionally based on if adding or editing/opening.
@@ -86,7 +125,10 @@ export default function EntryModal({ entry, type, user }) {
    const actionButtons =
       type === "edit" ?
          <DialogActions>
+            <Button color="error" onClick={handleDelete}>Delete</Button>
+            <div style={{flex: '1 0 0'}} />
             <Button onClick={handleClose}>Cancel</Button>
+            <Button variant="contained" onClick={handleEdit}>Edit</Button>
          </DialogActions>
          : type === "add" ?
             <DialogActions>
@@ -148,6 +190,11 @@ export default function EntryModal({ entry, type, user }) {
             </DialogContent>
             {actionButtons}
          </Dialog>
+         {/* <Snackbar open={snackbar.isOpen} autoHideDuration={4000} onClose={closeSnackbar}>
+            <Alert onClose={closeSnackbar} severity={snackbar.severity}>
+               {snackbar.message}
+            </Alert>
+         </Snackbar> */}
       </div>
    );
 }

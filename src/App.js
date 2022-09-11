@@ -11,6 +11,7 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Stack from "@mui/material/Stack";
+import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { createTheme, styled, ThemeProvider } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -20,9 +21,11 @@ import { useEffect, useState } from "react";
 import './App.css';
 import EntryTable from './components/EntryTable';
 import EntryModal from './components/EntryModal';
+import { Snackbar, Alert } from '@mui/material';
 import { mainListItems } from './components/listItems';
 import { db, SignInScreen } from './utils/firebase';
-import { emptyEntry } from './utils/mutations';
+import { emptyEntry, tableHeaderIDs } from './utils/mutations';
+import { categories } from './utils/categories';
 
 // MUI styling constants
 
@@ -83,6 +86,13 @@ export default function App() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
   const [currentUser, setcurrentUser] = useState(null); // Local user info
 
+  // Table management functionality
+
+  const [sortOption, setSortOption] = useState(tableHeaderIDs.NO_ORDER); // Sort table info
+  const [filterOption, setFilterOption] = useState(-1); // Filter table info
+
+  const compareStrings = (a, b, k) => (a[k] < b[k]) ? -1 : (a[k] > b[k]) ? 1 : 0;
+
   // Listen to the Firebase Auth state and set the local state.
   useEffect(() => {
     const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
@@ -118,9 +128,35 @@ export default function App() {
     onSnapshot(q, (snapshot) => {
       // Set Entries state variable to the current snapshot
       // For each entry, appends the document ID as an object property along with the existing document data
-      setEntries(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })))
+      setEntries(snapshot.docs
+                  .map(doc => ({ ...doc.data(), id: doc.id }))
+                  .sort((e1, e2) =>
+                    sortOption === tableHeaderIDs.NAME ? compareStrings(e1, e2, "name")
+                    : sortOption === tableHeaderIDs.LINK ? compareStrings(e1, e2, "link")
+                    : sortOption === tableHeaderIDs.CATEGORY ? compareStrings(e1, e2, "category")
+                    : 0))
     })
-  }, [currentUser]);
+  }, [currentUser, sortOption]);
+
+  const handleSortOptionToggled = (event) => {
+    const sort_op = event.target.value || tableHeaderIDs.NO_ORDER;
+    setEntries(entries.sort((e1, e2) =>
+                sort_op === tableHeaderIDs.NAME ? compareStrings(e1, e2, "name")
+                : sort_op === tableHeaderIDs.LINK ? compareStrings(e1, e2, "link")
+                : sort_op === tableHeaderIDs.CATEGORY ? compareStrings(e1, e2, "category")
+                : 0));
+    setSortOption(sort_op);
+  }
+
+  const [snackbar, toggleSnackbar] = useState({isOpen: false, message: "No message.", severity: "info"});
+
+   const closeSnackbar = () => {
+      toggleSnackbar({isOpen: false, message: snackbar.message, severity: snackbar.severity});
+   }
+
+   const snackbarCallback = (message, severity) => {
+      toggleSnackbar({isOpen: true, message: message, severity: severity});
+   }
 
   // Main content of homescreen. This is displayed conditionally from user auth status
 
@@ -130,11 +166,38 @@ export default function App() {
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Stack direction="row" spacing={3}>
-              <EntryModal entry={emptyEntry} type="add" user={currentUser} />
+              <EntryModal entry={emptyEntry} type="add" user={currentUser} snackbarCallback={snackbarCallback} />
+              <FormControl sx={{m: 1, minWidth: 120}} size="small">
+                <InputLabel id="sort_table_select_label">Sort</InputLabel>
+                <Select
+                  labelId="sort_table_select_label"
+                  id="sort_table_select"
+                  label="Sort"
+                  value={sortOption}
+                  onChange={handleSortOptionToggled}
+                >
+                  <MenuItem value={tableHeaderIDs.NO_ORDER}>No order</MenuItem>
+                  <MenuItem value={tableHeaderIDs.NAME}>Name</MenuItem>
+                  <MenuItem value={tableHeaderIDs.LINK}>Link</MenuItem>
+                  <MenuItem value={tableHeaderIDs.CATEGORY}>Category</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl sx={{m: 1, minWidth: 120}} size="small">
+                <InputLabel id="filter_table_select_label">Filter</InputLabel>
+                <Select
+                  labelId="filter_table_select_label"
+                  id="filter_table_select"
+                  label="Filter"
+                  value={filterOption}
+                  onChange={(event) => setFilterOption(event.target.value !== null ? event.target.value : -1)}
+                >
+                  {categories.map((category) => <MenuItem value={category.id}>{category.name}</MenuItem>)}
+                </Select>
+              </FormControl>
             </Stack>
           </Grid>
           <Grid item xs={12}>
-            <EntryTable entries={entries} />
+            <EntryTable snackbarCallback={snackbarCallback} entries={entries.filter((entry) => filterOption === -1 ? true : entry.category === filterOption)} />
           </Grid>
         </Grid>
       )
@@ -234,6 +297,11 @@ export default function App() {
           </Container>
         </Box>
       </Box>
+      <Snackbar open={snackbar.isOpen} autoHideDuration={4000} onClose={closeSnackbar}>
+        <Alert onClose={closeSnackbar} severity={snackbar.severity}>
+            {snackbar.message}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 }

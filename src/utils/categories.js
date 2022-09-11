@@ -2,10 +2,11 @@
 // ! DO NOT CHANGE THIS
 
 export const categories = [
-   { id: 0, name: "Default" },
-   { id: 1, name: "Startup" },
-   { id: 2, name: "Nonprofit" },
-   { id: 3, name: "Misc" }
+   { id: -1, name: "No filter", chipColorScheme: "error" },
+   { id: 0, name: "Default", chipColorScheme: "info" },
+   { id: 1, name: "Startup", chipColorScheme: "success" },
+   { id: 2, name: "Nonprofit", chipColorScheme: "warning" },
+   { id: 3, name: "Misc", chipColorScheme: "secondary" }
 ];
 
 export function getCategory(category_id) {
