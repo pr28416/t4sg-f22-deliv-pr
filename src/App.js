@@ -128,6 +128,7 @@ export default function App() {
     onSnapshot(q, (snapshot) => {
       // Set Entries state variable to the current snapshot
       // For each entry, appends the document ID as an object property along with the existing document data
+      // Sort if necessary (according to user choice of sortOption)
       setEntries(snapshot.docs
                   .map(doc => ({ ...doc.data(), id: doc.id }))
                   .sort((e1, e2) =>
@@ -138,6 +139,7 @@ export default function App() {
     })
   }, [currentUser, sortOption]);
 
+  // Sorts table according to user-selected key
   const handleSortOptionToggled = (event) => {
     const sort_op = event.target.value || tableHeaderIDs.NO_ORDER;
     setEntries(entries.sort((e1, e2) =>
@@ -148,15 +150,10 @@ export default function App() {
     setSortOption(sort_op);
   }
 
+  // Snackbar for delivering statuses on add/update/delete
   const [snackbar, toggleSnackbar] = useState({isOpen: false, message: "No message.", severity: "info"});
-
-   const closeSnackbar = () => {
-      toggleSnackbar({isOpen: false, message: snackbar.message, severity: snackbar.severity});
-   }
-
-   const snackbarCallback = (message, severity) => {
-      toggleSnackbar({isOpen: true, message: message, severity: severity});
-   }
+  const closeSnackbar = () => toggleSnackbar({isOpen: false, message: snackbar.message, severity: snackbar.severity});
+  const snackbarCallback = (message, severity) => toggleSnackbar({isOpen: true, message: message, severity: severity});
 
   // Main content of homescreen. This is displayed conditionally from user auth status
 
@@ -167,6 +164,7 @@ export default function App() {
           <Grid item xs={12}>
             <Stack direction="row" spacing={3}>
               <EntryModal entry={emptyEntry} type="add" user={currentUser} snackbarCallback={snackbarCallback} />
+              {/* Sort table dropdown */}
               <FormControl sx={{m: 1, minWidth: 120}} size="small">
                 <InputLabel id="sort_table_select_label">Sort</InputLabel>
                 <Select
@@ -182,6 +180,7 @@ export default function App() {
                   <MenuItem value={tableHeaderIDs.CATEGORY}>Category</MenuItem>
                 </Select>
               </FormControl>
+              {/* Filter table dropdown */}
               <FormControl sx={{m: 1, minWidth: 120}} size="small">
                 <InputLabel id="filter_table_select_label">Filter</InputLabel>
                 <Select
@@ -197,6 +196,7 @@ export default function App() {
             </Stack>
           </Grid>
           <Grid item xs={12}>
+            {/* Filter table according to user key */}
             <EntryTable snackbarCallback={snackbarCallback} entries={entries.filter((entry) => filterOption === -1 ? true : entry.category === filterOption)} />
           </Grid>
         </Grid>
@@ -297,6 +297,7 @@ export default function App() {
           </Container>
         </Box>
       </Box>
+      {/* Snackbar for displaying notifications about add/update/delete */}
       <Snackbar open={snackbar.isOpen} autoHideDuration={4000} onClose={closeSnackbar}>
         <Alert onClose={closeSnackbar} severity={snackbar.severity}>
             {snackbar.message}

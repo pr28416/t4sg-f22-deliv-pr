@@ -25,13 +25,12 @@ entry: Data about the entry in question
 type: Type of entry modal being opened. 
    This can be "add" (for adding a new entry) or 
    "edit" (for opening or editing an existing entry from table).
-user: User making query (The current logged in user). */
+user: User making query (The current logged in user).
+snackbarCallback: A callback reference to a similar function in App.js to display notifications.*/
 
 export default function EntryModal({ entry, type, user, snackbarCallback }) {
 
    // State variables for modal status
-
-   // TODO: For editing, you may have to add and manage another state variable to check if the entry is being edited.
 
    const [open, setOpen] = useState(false);
    const [name, setName] = useState(entry.name);
@@ -55,12 +54,7 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
 
    // Mutation handlers
 
-   // const [snackbar, toggleSnackbar] = useState({isOpen: false, message: "No message.", severity: "info"});
-
-   // const closeSnackbar = () => {
-   //    toggleSnackbar({isOpen: false, message: snackbar.message, severity: snackbar.severity});
-   // }
-
+   // Handles add mutation along with appropriate snackbar notification
    const handleAdd = () => {
       const newEntry = {
          name: name,
@@ -79,7 +73,7 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
       handleClose();
    };
 
-   // TODO: Add Edit Mutation Handler
+   // Handles edit mutation along with appropriate snackbar notification
    const handleEdit = () => {
       const updatedEntry = {
          name: name || entry.name,
@@ -98,7 +92,7 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
       handleClose();
    }
 
-   // TODO: Add Delete Mutation Handler
+   // Handles delete mutation along with appropriate snackbar notification
    const handleDelete = () => {
       const name = entry.name;
       deleteEntry(entry)
@@ -111,7 +105,6 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
 
    // Button handlers for modal opening and inside-modal actions.
    // These buttons are displayed conditionally based on if adding or editing/opening.
-   // TODO: You may have to edit these buttons to implement editing/deleting functionality.
 
    const openButton =
       type === "edit" ? <IconButton onClick={handleClickOpen}>
@@ -143,7 +136,6 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
          <Dialog open={open} onClose={handleClose}>
             <DialogTitle>{type === "edit" ? name : "Add Entry"}</DialogTitle>
             <DialogContent>
-               {/* TODO: Feel free to change the properties of these components to implement editing functionality. The InputProps props class for these MUI components allows you to change their traditional CSS properties. */}
                <TextField
                   margin="normal"
                   id="name"
@@ -190,11 +182,6 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
             </DialogContent>
             {actionButtons}
          </Dialog>
-         {/* <Snackbar open={snackbar.isOpen} autoHideDuration={4000} onClose={closeSnackbar}>
-            <Alert onClose={closeSnackbar} severity={snackbar.severity}>
-               {snackbar.message}
-            </Alert>
-         </Snackbar> */}
       </div>
    );
 }

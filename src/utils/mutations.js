@@ -18,6 +18,7 @@ export const tableHeaderIDs = {
    CATEGORY: 3
 }
 
+// Add an entry to Firebase database
 export async function addEntry(entry) {
    await addDoc(collection(db, "entries"), {
       name: entry.name,
@@ -29,6 +30,7 @@ export async function addEntry(entry) {
    });
 }
 
+// Update an existing entry to Firebase database
 export async function updateEntry(entry) {
    await updateDoc(doc(db, "entries", entry.id), {
       name: entry.name,
@@ -38,9 +40,9 @@ export async function updateEntry(entry) {
       category: entry.category,
       userid: entry.userid,
    });
-   // throw Error("Debug error for updateEntry");
 }
 
+// Delete an entry from Firebase database
 export async function deleteEntry(entry) {
    await deleteDoc(doc(db, "entries", entry.id));
 }
