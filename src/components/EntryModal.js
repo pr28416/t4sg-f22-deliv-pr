@@ -17,6 +17,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { categories } from '../utils/categories';
 import { addEntry, deleteEntry, updateEntry } from '../utils/mutations';
+import RatingMeter from './RatingMeter';
 
 // Modal component for individual entries.
 
@@ -36,7 +37,8 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
    const [name, setName] = useState(entry.name);
    const [link, setLink] = useState(entry.link);
    const [description, setDescription] = useState(entry.description);
-   const [category, setCategory] = React.useState(entry.category);
+   const [category, setCategory] = useState(entry.category);
+   const [rating, setRating] = useState(entry.rating);
 
    // Modal visibility handlers
 
@@ -46,6 +48,7 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
       setLink(entry.link);
       setDescription(entry.description);
       setCategory(entry.category);
+      setRating(entry.rating);
    };
 
    const handleClose = () => {
@@ -62,6 +65,7 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
          description: description,
          user: user?.displayName,
          category: category,
+         rating: rating,
          userid: user?.uid,
       };
 
@@ -81,6 +85,7 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
          description: description || entry.description,
          user: user?.displayName || entry.user,
          category: category,
+         rating: rating || entry.rating,
          userid: user?.uid || entry.userid,
          id: entry.id
       }
@@ -166,7 +171,6 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
                   value={description}
                   onChange={(event) => setDescription(event.target.value)}
                />
-
                <FormControl fullWidth sx={{ "margin-top": 20 }}>
                   <InputLabel id="demo-simple-select-label">Category</InputLabel>
                   <Select
@@ -179,6 +183,10 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
                      {categories.map((category) => (<MenuItem value={category.id}>{category.name}</MenuItem>))}
                   </Select>
                </FormControl>
+               <div style={{"display": "inline-flex", "marginTop": 16}}>
+                  <InputLabel>Rating</InputLabel>
+                  <RatingMeter initRating={rating} editable={true} parentCallback={(rating) => setRating(rating)} />
+               </div>
             </DialogContent>
             {actionButtons}
          </Dialog>

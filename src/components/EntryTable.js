@@ -9,6 +9,7 @@ import TableRow from '@mui/material/TableRow';
 import EntryModal from './EntryModal';
 import { Chip } from '@mui/material';
 import { getCategory } from '../utils/categories';
+import RatingMeter from './RatingMeter';
 import * as React from 'react';
 
 // Table component that displays entries on home screen
@@ -24,6 +25,7 @@ export default function EntryTable({ entries, snackbarCallback }) {
                   <TableCell align="right">Link</TableCell>
                   <TableCell align="right">User</TableCell>
                   <TableCell align="right">Category</TableCell>
+                  <TableCell align="center">Rating</TableCell>
                   <TableCell align="right">Open</TableCell>
                </TableRow>
             </TableHead>
@@ -40,6 +42,9 @@ export default function EntryTable({ entries, snackbarCallback }) {
                      <TableCell align="right">{entry.user}</TableCell>
                      <TableCell align="right">
                         <Chip label={getCategory(entry.category).name} variant="outlined" color={getCategory(entry.category).chipColorScheme} />
+                     </TableCell>
+                     <TableCell align="center">
+                        <RatingMeter initRating={entry.rating} editable={false}></RatingMeter>
                      </TableCell>
                      <TableCell sx={{ "padding-top": 0, "padding-bottom": 0 }} align="right">
                         <EntryModal entry={entry} type="edit" snackbarCallback={snackbarCallback} />

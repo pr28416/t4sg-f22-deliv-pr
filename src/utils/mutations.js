@@ -9,13 +9,15 @@ export const emptyEntry = {
    description: "",
    user: "",
    category: 0,
+   rating: 0,
 }
 
 export const tableHeaderIDs = {
    NO_ORDER: 0,
    NAME: 1,
    LINK: 2,
-   CATEGORY: 3
+   CATEGORY: 3,
+   RATING: 4,
 }
 
 // Add an entry to Firebase database
@@ -26,6 +28,7 @@ export async function addEntry(entry) {
       description: entry.description,
       user: entry.user,
       category: entry.category,
+      rating: entry.rating,
       userid: entry.userid,
    });
 }
@@ -38,6 +41,7 @@ export async function updateEntry(entry) {
       description: entry.description,
       user: entry.user,
       category: entry.category,
+      rating: entry.rating,
       userid: entry.userid,
    });
 }

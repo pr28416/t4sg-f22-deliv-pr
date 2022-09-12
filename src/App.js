@@ -135,20 +135,10 @@ export default function App() {
                     sortOption === tableHeaderIDs.NAME ? compareStrings(e1, e2, "name")
                     : sortOption === tableHeaderIDs.LINK ? compareStrings(e1, e2, "link")
                     : sortOption === tableHeaderIDs.CATEGORY ? compareStrings(e1, e2, "category")
+                    : sortOption === tableHeaderIDs.RATING ? e2.rating-e1.rating
                     : 0))
     })
   }, [currentUser, sortOption]);
-
-  // Sorts table according to user-selected key
-  const handleSortOptionToggled = (event) => {
-    const sort_op = event.target.value || tableHeaderIDs.NO_ORDER;
-    setEntries(entries.sort((e1, e2) =>
-                sort_op === tableHeaderIDs.NAME ? compareStrings(e1, e2, "name")
-                : sort_op === tableHeaderIDs.LINK ? compareStrings(e1, e2, "link")
-                : sort_op === tableHeaderIDs.CATEGORY ? compareStrings(e1, e2, "category")
-                : 0));
-    setSortOption(sort_op);
-  }
 
   // Snackbar for delivering statuses on add/update/delete
   const [snackbar, toggleSnackbar] = useState({isOpen: false, message: "No message.", severity: "info"});
@@ -172,12 +162,13 @@ export default function App() {
                   id="sort_table_select"
                   label="Sort"
                   value={sortOption}
-                  onChange={handleSortOptionToggled}
+                  onChange={(event) => setSortOption(event.target.value || tableHeaderIDs.NO_ORDER)}
                 >
                   <MenuItem value={tableHeaderIDs.NO_ORDER}>No order</MenuItem>
                   <MenuItem value={tableHeaderIDs.NAME}>Name</MenuItem>
                   <MenuItem value={tableHeaderIDs.LINK}>Link</MenuItem>
                   <MenuItem value={tableHeaderIDs.CATEGORY}>Category</MenuItem>
+                  <MenuItem value={tableHeaderIDs.RATING}>Rating</MenuItem>
                 </Select>
               </FormControl>
               {/* Filter table dropdown */}
