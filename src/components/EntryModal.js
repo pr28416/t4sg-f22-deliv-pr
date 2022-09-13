@@ -183,8 +183,10 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
                      {categories.map((category) => (<MenuItem value={category.id}>{category.name}</MenuItem>))}
                   </Select>
                </FormControl>
-               <div style={{"display": "inline-flex", "marginTop": 16}}>
-                  <InputLabel>Rating</InputLabel>
+               <div style={{"display": "flex", "marginTop": 16, "alignItems": "center"}}>
+                  <div>
+                     <InputLabel>Rating</InputLabel>
+                  </div>
                   <RatingMeter initRating={rating} editable={true} parentCallback={(rating) => setRating(rating)} />
                </div>
             </DialogContent>
