@@ -184,9 +184,7 @@ export default function EntryModal({ entry, type, user, snackbarCallback }) {
                   </Select>
                </FormControl>
                <div style={{"display": "flex", "marginTop": 16, "alignItems": "center"}}>
-                  <div>
-                     <InputLabel>Rating</InputLabel>
-                  </div>
+                  <div><InputLabel>Rating</InputLabel></div>
                   <RatingMeter initRating={rating} editable={true} parentCallback={(rating) => setRating(rating)} />
                </div>
             </DialogContent>
